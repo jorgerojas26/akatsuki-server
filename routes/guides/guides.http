@@ -1,0 +1,22 @@
+GET http://localhost:3000/guides
+
+GET http://localhost:3000/guides?namesOnly=true
+
+POST http://localhost:3000/guides
+Content-Type: application/json
+
+{
+  "name": "Hola, soy una guia",
+  "keywords": ["hola", "soy", "una", "guia"],
+  "collections": ["entrada1", "entrada2"]
+}
+
+PATCH http://localhost:3000/guides/Youtube
+Content-Type: application/json
+
+{
+  "name": "Youtube",
+  "keywords": []
+}
+
+DELETE http://localhost:3000/guides/61b40ff861fa262e281d163a
