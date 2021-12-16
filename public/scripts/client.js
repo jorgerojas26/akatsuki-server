@@ -1,3 +1,4 @@
+const FECA_PROXY_URL = 'https://feca-proxy.appen.com';
 const job_content_container = document.querySelector('.content');
 const job_title = document.querySelector('.job-title');
 const slug_job_title = job_title?.innerText.replace(/ /g, '-').toLowerCase();
@@ -106,7 +107,6 @@ script_selector.onchange = function () {
   onSelectorChange({ script_id: selected_script });
 };
 
-// CLOSE MODAL BUTTONS LISTENERS
 visualizer_close_button.onclick = () => {
   visualizer_modal_textarea.value = '';
   visualizer_modal.style.display = 'none';
@@ -181,7 +181,7 @@ add_guide_button.onclick = () => {
 create_guide_form?.addEventListener('submit', create_guide);
 
 // SOCKET.IO LOGIC
-const socket = io('https://akatsuki-server-test.herokuapp.com');
+const socket = io('https://akatsuki-server-test.herokuapp.com/');
 
 socket.on('connect', () => {
   showMessage('Connected to server', 'green');
@@ -203,6 +203,22 @@ socket.on('reload', (task_name) => {
     location.reload();
   }
 });
+
+function fetch_earnings() {
+  return new Promise((resolve) => {
+    GM_xmlhttpRequest({
+      method: 'GET',
+      url: FECA_PROXY_URL + '/v1/users/payments_summary',
+      credentials: 'include',
+      responseType: 'json',
+      onload: function (response) {
+        if (response.status === 200) {
+          resolve(response.response);
+        }
+      },
+    });
+  });
+}
 
 function visualize_resource(resource_text, title) {
   visualizer_modal_title.innerHTML = title;
