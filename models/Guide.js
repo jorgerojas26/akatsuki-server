@@ -6,10 +6,19 @@ const guideSchema = new mongoose.Schema({
     required: true,
   },
   collections: {
-    type: [Object],
+    type: String,
+    required: false,
+    default: '[]',
   },
   keywords: {
-    type: [Object],
+    type: String,
+    required: false,
+    default: '[]',
+  },
+  script: {
+    type: String,
+    required: false,
+    default: '',
   },
 });
 

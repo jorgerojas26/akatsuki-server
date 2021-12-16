@@ -2,6 +2,10 @@ GET http://localhost:3000/guides
 
 GET http://localhost:3000/guides?namesOnly=true
 
+GET http://localhost:3000/guides/61b411bd6bda96f16e5d1b6a
+
+GET http://localhost:3000/guides/needed/annotate-and-categorize-objects-in-an-image-using-a-bounding-box
+
 POST http://localhost:3000/guides
 Content-Type: application/json
 
@@ -19,4 +23,4 @@ Content-Type: application/json
   "keywords": []
 }
 
-DELETE http://localhost:3000/guides/61b40ff861fa262e281d163a
+DELETE http://localhost:3000/guides/61ba8653871e0da1e99d7ba8
