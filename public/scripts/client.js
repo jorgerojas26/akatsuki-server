@@ -225,7 +225,7 @@ function onSelectorChange(payload, callback) {
   try {
     GM_xmlhttpRequest({
       method: 'PATCH',
-      url: 'http://localhost:3000/task-guide-info/' + slug_job_title,
+      url: `${server_uri}/task-guide-info/` + slug_job_title,
       headers: { 'Content-Type': 'application/json' },
       data: JSON.stringify(payload),
       responseType: 'json',
@@ -261,7 +261,7 @@ function is_json_valid(json_string) {
 async function get_server_info_for_this_task() {
   GM_xmlhttpRequest({
     method: 'GET',
-    url: 'http://localhost:3000/guides/needed/' + slug_job_title,
+    url: `${server_uri}/guides/needed/` + slug_job_title,
     responseType: 'json',
     onload: function (response) {
       const { all_guides, selector_info, current_task_guide_info } = response.response;
@@ -277,7 +277,7 @@ function get_all_guides() {
   return new Promise((resolve) => {
     GM_xmlhttpRequest({
       method: 'GET',
-      url: 'http://localhost:3000/guides?namesOnly=true',
+      url: `${server_uri}/guides?namesOnly=true`,
       responseType: 'json',
       onload: async (response) => {
         const all_guides = response.response;
@@ -291,7 +291,7 @@ function get_actual_info(guide_id) {
   return new Promise((resolve) => {
     GM_xmlhttpRequest({
       method: 'GET',
-      url: 'http://localhost:3000/guides/' + guide_id,
+      url: `${server_uri}/guides/` + guide_id,
       responseType: 'json',
       onload: function (response) {
         resolve(response.response);
@@ -304,7 +304,7 @@ function get_task_guide_info() {
   return new Promise((resolve) => {
     GM_xmlhttpRequest({
       method: 'GET',
-      url: 'http://localhost:3000/task-guide-info/' + slug_job_title,
+      url: `${server_uri}/task-guide-info/` + slug_job_title,
       responseType: 'json',
       onload: function (response) {
         resolve(response.response);
@@ -371,7 +371,7 @@ function create_guide(event) {
 
   GM_xmlhttpRequest({
     method: 'POST',
-    url: 'http://localhost:3000/guides',
+    url: `${server_uri}/guides`,
     headers: { 'Content-Type': 'application/json' },
     responseType: 'json',
     data: JSON.stringify({
@@ -403,7 +403,7 @@ function update_resource(resource_id, payload) {
   try {
     GM_xmlhttpRequest({
       method: 'PATCH',
-      url: 'http://localhost:3000/guides/' + resource_id,
+      url: `${server_uri}/guides/` + resource_id,
       headers: { 'Content-Type': 'application/json' },
       responseType: 'json',
       data: payload,
