@@ -181,7 +181,7 @@ add_guide_button.onclick = () => {
 create_guide_form?.addEventListener('submit', create_guide);
 
 // SOCKET.IO LOGIC
-const socket = io('http://localhost:3000');
+const socket = io('https://akatsuki-server-test.herokuapp.com');
 
 socket.on('connect', () => {
   showMessage('Connected to server', 'green');
