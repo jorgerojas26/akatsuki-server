@@ -45,6 +45,6 @@ io.on('connection', (socket) => {
 
 app.use(express.static('public'));
 
-httpServer.listen(3000, '127.0.0.1', () => {
+httpServer.listen(process.env.PORT || 3000, () => {
   console.log('listening on *:3000');
 });
