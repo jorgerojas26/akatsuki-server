@@ -8,11 +8,12 @@ Content-Type: application/json
 "active": true
 } 
 
-PATCH http://localhost:3000/include-list/61ba8653871e0da1e99d7ba8
+PATCH http://localhost:3000/include-list/61bbfe93e6227aed965530ef
 Content-Type: application/json
 
 {
   "task": "annotate",
-  "active": false
+  "active": true
 }
 
+DELETE http://localhost:3000/include-list/61bbfe93e6227aed965530ef

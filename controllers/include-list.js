@@ -36,8 +36,20 @@ const UPDATE_INCLUDE_LIST = async (req, res) => {
   }
 };
 
+const DELETE_INCLUDE_LIST_ITEM = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const includeList = await IncludeList.findByIdAndDelete(id);
+    res.status(200).json(includeList);
+  } catch (error) {
+    res.status(500).json({ error: { message: error.message } });
+  }
+};
+
 export default {
   GET_INCLUDE_LIST,
   CREATE_INCLUDE_LIST_ITEM,
   UPDATE_INCLUDE_LIST,
+  DELETE_INCLUDE_LIST_ITEM,
 };
