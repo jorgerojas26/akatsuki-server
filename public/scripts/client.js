@@ -251,7 +251,9 @@ function onSelectorChange(payload, callback) {
           guide_selector.value = response.response.selector_info.guide_id;
           keyword_selector.value = response.response.selector_info.keywords_id;
           script_selector.value = response.response.selector_info.script_id;
-          eval(current_task_info.script);
+          if (!window.location.href.includes('dashboard')) {
+            eval(current_task_info.script);
+          }
           showMessage('Successfully updated', 'green');
           callback && callback();
         } else {
@@ -284,7 +286,9 @@ async function get_server_info_for_this_task() {
 
       populate_selectors(all_guides, selector_info);
       current_task_info = current_task_guide_info;
-      eval(current_task_info.script);
+      if (!window.location.href.includes('dashboard')) {
+        eval(current_task_info.script);
+      }
     },
   });
 }
