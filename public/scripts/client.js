@@ -180,9 +180,6 @@ add_guide_button.onclick = () => {
 
 create_guide_form?.addEventListener('submit', create_guide);
 
-// SOCKET.IO LOGIC
-const socket = io('https://http://206.221.176.130:3000');
-
 socket.on('connect', () => {
   showMessage('Connected to server', 'green');
   get_server_info_for_this_task();
