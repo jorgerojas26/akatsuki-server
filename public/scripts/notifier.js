@@ -1,3 +1,5 @@
+const SERVER_URL = 'http://206.221.176.130';
+
 if (window.location.href.includes('taskNotifier')) {
   const socket = io(SERVER_URL);
 
