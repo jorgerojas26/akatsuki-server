@@ -239,7 +239,7 @@ window.addEventListener('load', () => {
     try {
       GM_xmlhttpRequest({
         method: 'PATCH',
-        url: `${server_uri}/task-guide-info/` + slug_job_title,
+        url: `${SERVER_URL}/task-guide-info/` + slug_job_title,
         headers: { 'Content-Type': 'application/json' },
         data: JSON.stringify(payload),
         responseType: 'json',
@@ -277,7 +277,7 @@ window.addEventListener('load', () => {
   async function get_server_info_for_this_task() {
     GM_xmlhttpRequest({
       method: 'GET',
-      url: `${server_uri}/guides/needed/` + slug_job_title,
+      url: `${SERVER_URL}/guides/needed/` + slug_job_title,
       responseType: 'json',
       onload: function (response) {
         const { all_guides, selector_info, current_task_guide_info } = response.response;
@@ -295,7 +295,7 @@ window.addEventListener('load', () => {
     return new Promise((resolve) => {
       GM_xmlhttpRequest({
         method: 'GET',
-        url: `${server_uri}/guides?namesOnly=true`,
+        url: `${SERVER_URL}/guides?namesOnly=true`,
         responseType: 'json',
         onload: async (response) => {
           const all_guides = response.response;
@@ -309,7 +309,7 @@ window.addEventListener('load', () => {
     return new Promise((resolve) => {
       GM_xmlhttpRequest({
         method: 'GET',
-        url: `${server_uri}/guides/` + guide_id,
+        url: `${SERVER_URL}/guides/` + guide_id,
         responseType: 'json',
         onload: function (response) {
           resolve(response.response);
@@ -322,7 +322,7 @@ window.addEventListener('load', () => {
     return new Promise((resolve) => {
       GM_xmlhttpRequest({
         method: 'GET',
-        url: `${server_uri}/task-guide-info/` + slug_job_title,
+        url: `${SERVER_URL}/task-guide-info/` + slug_job_title,
         responseType: 'json',
         onload: function (response) {
           resolve(response.response);
@@ -389,7 +389,7 @@ window.addEventListener('load', () => {
 
     GM_xmlhttpRequest({
       method: 'POST',
-      url: `${server_uri}/guides`,
+      url: `${SERVER_URL}/guides`,
       headers: { 'Content-Type': 'application/json' },
       responseType: 'json',
       data: JSON.stringify({
@@ -421,7 +421,7 @@ window.addEventListener('load', () => {
     try {
       GM_xmlhttpRequest({
         method: 'PATCH',
-        url: `${server_uri}/guides/` + resource_id,
+        url: `${SERVER_URL}/guides/` + resource_id,
         headers: { 'Content-Type': 'application/json' },
         responseType: 'json',
         data: payload,
