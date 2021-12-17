@@ -17,7 +17,7 @@ const CREATE_INCLUDE_LIST_ITEM = async (req, res, io) => {
       res.status(400).json({ error: { message: 'Item already exists' } });
     } else {
       const newItem = await IncludeList.create({ task, active });
-      io.emit('includeList', { action: 'create', newItem });
+      io.emit('includeList', { action: 'create', item: newItem });
       res.status(200).json(newItem);
     }
   } catch (error) {
@@ -31,7 +31,7 @@ const UPDATE_INCLUDE_LIST = async (req, res, io) => {
 
   try {
     const includeList = await IncludeList.findByIdAndUpdate(id, { task, active }, { new: true, upsert: true });
-    io.emit('includeList', { action: 'update', includeList });
+    io.emit('includeList', { action: 'update', item: includeList });
     res.status(200).json(includeList);
   } catch (error) {
     res.status(500).json({ error: { message: error.message } });
@@ -43,7 +43,7 @@ const DELETE_INCLUDE_LIST_ITEM = async (req, res, io) => {
 
   try {
     const includeList = await IncludeList.findByIdAndDelete(id);
-    io.emit('includeList', { action: 'delete', includeList });
+    io.emit('includeList', { action: 'delete', item: includeList });
     res.status(200).json(includeList);
   } catch (error) {
     res.status(500).json({ error: { message: error.message } });
