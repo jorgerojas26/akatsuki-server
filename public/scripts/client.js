@@ -2,7 +2,7 @@ const FECA_PROXY_URL = 'https://feca-proxy.appen.com';
 const job_content_container = document.querySelector('.content');
 const job_title = document.querySelector('.job-title');
 const slug_job_title = job_title?.innerText.replace(/ /g, '-').toLowerCase();
-let current_task_info = {
+window.current_task_info = {
   name: '',
   collections: [],
   keywords: [],
@@ -131,7 +131,7 @@ view_collections_button.onclick = () => {
 
   visualizer_save_button.setAttribute('data-resource-id', selected.value);
   visualizer_save_button.setAttribute('data-resource-name', 'collections');
-  visualize_resource(JSON.stringify(JSON.parse(current_task_info.collections), null, 2), title);
+  visualize_resource(JSON.stringify(JSON.parse(window.current_task_info.collections), null, 2), title);
 };
 
 view_keyword_button.onclick = () => {
@@ -140,7 +140,7 @@ view_keyword_button.onclick = () => {
 
   visualizer_save_button.setAttribute('data-resource-id', selected.value);
   visualizer_save_button.setAttribute('data-resource-name', 'keywords');
-  visualize_resource(JSON.stringify(JSON.parse(current_task_info.keywords), null, 2), title);
+  visualize_resource(JSON.stringify(JSON.parse(window.current_task_info.keywords), null, 2), title);
 };
 
 view_script_button.onclick = () => {
@@ -149,7 +149,7 @@ view_script_button.onclick = () => {
 
   visualizer_save_button.setAttribute('data-resource-id', selected.value);
   visualizer_save_button.setAttribute('data-resource-name', 'script');
-  visualize_resource(current_task_info.script, title);
+  visualize_resource(window.current_task_info.script, title);
 };
 
 visualizer_save_button.onclick = () => {
@@ -164,7 +164,7 @@ visualizer_save_button.onclick = () => {
   }
 
   if (resource_name === 'script' && !window.location.href.includes('dashboard')) {
-    current_task_info.script = text;
+    window.current_task_info.script = text;
     eval(text);
   }
   update_resource(resource_id, JSON.stringify({ [resource_name]: text }));
@@ -247,12 +247,12 @@ function onSelectorChange(payload, callback) {
       responseType: 'json',
       onload: function (response) {
         if (response.status === 200) {
-          current_task_info = response.response.guide_info;
+          window.current_task_info = response.response.guide_info;
           guide_selector.value = response.response.selector_info.guide_id;
           keyword_selector.value = response.response.selector_info.keywords_id;
           script_selector.value = response.response.selector_info.script_id;
           if (!window.location.href.includes('dashboard')) {
-            eval(current_task_info.script);
+            eval(window.current_task_info.script);
           }
           showMessage('Successfully updated', 'green');
           callback && callback();
@@ -285,9 +285,9 @@ async function get_server_info_for_this_task() {
       const { all_guides, selector_info, current_task_guide_info } = response.response;
 
       populate_selectors(all_guides, selector_info);
-      current_task_info = current_task_guide_info;
+      window.current_task_info = current_task_guide_info;
       if (!window.location.href.includes('dashboard')) {
-        eval(current_task_info.script);
+        eval(window.current_task_info.script);
       }
     },
   });
@@ -431,7 +431,7 @@ function update_resource(resource_id, payload) {
         visualizer_modal.style.display = 'none';
         if (response.status === 200) {
           console.log(response.response);
-          current_task_info = response.response;
+          window.current_task_info = response.response;
           showMessage('Successfully updated', 'green');
           visualizer_modal_textarea.value = '';
         } else {
