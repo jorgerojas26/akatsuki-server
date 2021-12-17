@@ -3,8 +3,16 @@ const router = express.Router();
 
 import controller from '../../controllers/include-list.js';
 
-router.route('/').get(controller.GET_INCLUDE_LIST).post(controller.CREATE_INCLUDE_LIST_ITEM);
+export default function (io) {
+  router
+    .route('/')
+    .get(controller.GET_INCLUDE_LIST)
+    .post((req, res) => controller.CREATE_INCLUDE_LIST_ITEM(req, res, io));
 
-router.route('/:id').patch(controller.UPDATE_INCLUDE_LIST).delete(controller.DELETE_INCLUDE_LIST_ITEM);
+  router
+    .route('/:id')
+    .patch((req, res) => controller.UPDATE_INCLUDE_LIST(req, res, io))
+    .delete((req, res) => controller.DELETE_INCLUDE_LIST_ITEM(req, res, io));
+}
 
-export default router;
+export { router };
