@@ -1,4 +1,5 @@
 const FECA_PROXY_URL = 'https://feca-proxy.appen.com';
+const SERVER_URL = 'http://206.221.176.130'
 const job_content_container = document.querySelector('.content');
 const job_title = document.querySelector('.job-title');
 const slug_job_title = job_title?.innerText.replace(/ /g, '-').toLowerCase();
@@ -163,7 +164,7 @@ visualizer_save_button.onclick = () => {
     return;
   }
 
-  if (resource_name === 'script') {
+  if (resource_name === 'script' && !window.location.href.includes('dashboard')) {
     current_task_info.script = text;
     eval(text);
   }
@@ -180,8 +181,7 @@ add_guide_button.onclick = () => {
 
 create_guide_form?.addEventListener('submit', create_guide);
 
-// SOCKET.IO LOGIC
-const socket = io('https://http://206.221.176.130:3000');
+const socket = io(SERVER_URL);
 
 socket.on('connect', () => {
   showMessage('Connected to server', 'green');
