@@ -1,8 +1,9 @@
-window.addEventListener('load', () => {
+setTimeout(() => {
   const FECA_PROXY_URL = 'https://feca-proxy.appen.com';
   const job_content_container = document.querySelector('.content');
   const job_title = document.querySelector('.job-title');
   const slug_job_title = job_title?.innerText.replace(/ /g, '-').toLowerCase();
+
   window.current_task_info = {
     name: '',
     collections: [],
@@ -181,9 +182,9 @@ window.addEventListener('load', () => {
 
   create_guide_form?.addEventListener('submit', create_guide);
 
+  get_server_info_for_this_task();
   socket.on('connect', () => {
     showMessage('Connected to server', 'green');
-    get_server_info_for_this_task();
   });
 
   socket.on('connect_error', (error) => {
@@ -428,7 +429,6 @@ window.addEventListener('load', () => {
         onload: function (response) {
           visualizer_modal.style.display = 'none';
           if (response.status === 200) {
-            console.log(response.response);
             window.current_task_info = response.response;
             showMessage('Successfully updated', 'green');
             visualizer_modal_textarea.value = '';
@@ -441,6 +441,77 @@ window.addEventListener('load', () => {
       console.log(error);
     }
   }
+
+  function add_item_to_guide(payload) {
+    console.log('receiving payload', payload);
+    return new Promise((resolve) => {
+      GM_xmlhttpRequest({
+        method: 'POST',
+        url: `${SERVER_URL}/guides/${current_task_info._id}`,
+        headers: { 'Content-Type': 'application/json' },
+        responseType: 'json',
+        data: JSON.stringify({
+          task: payload,
+        }),
+        onload: function (response) {
+          resolve(response.response);
+        },
+      });
+    });
+  }
+
+  const jsawesome = document.querySelectorAll('.jsawesome');
+
+  jsawesome.forEach((wrapper) => {
+    const inputs = wrapper.querySelectorAll('input,textarea');
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.innerText = 'Enviar';
+    button.onclick = () => {
+      const inputs_response = [];
+      if (!window.job_identifier) {
+        alert('Please add window.job_identifier on the server script of this task');
+        return;
+      }
+
+      const identifier_element = wrapper.querySelector(window.job_identifier);
+      let identifier_value = '';
+
+      if (identifier_element.tagName === 'IMG') {
+        identifier_value = identifier_element.src;
+      } else {
+        identifier_value = identifier_element.innerHTML;
+      }
+
+      Array.from(inputs).forEach((input, index) => {
+        if (
+          input.type !== 'hidden' &&
+          (((input.type === 'checkbox' || input.type === 'radio') && input.checked) ||
+            (input.type === 'text' && input.value !== '') ||
+            (input.tagName === 'TEXTAREA' && input.value !== ''))
+        ) {
+          inputs_response.push({
+            tagName: input.tagName,
+            type: input.type,
+            value: input.value,
+            checked: input.checked,
+            index,
+          });
+        }
+      });
+
+      const response = add_item_to_guide({
+        identifier_element: window.job_identifier,
+        identifier_value,
+        responses: inputs_response,
+      });
+
+      if (!response.error) {
+        wrapper.style.background = 'lightgreen';
+      }
+    };
+    wrapper.append(button);
+  });
 
   if (window.location.href.includes('/assignments/dashboard')) {
     const error_div = document.querySelector('.hero-unit');
