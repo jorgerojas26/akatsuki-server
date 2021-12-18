@@ -2,7 +2,10 @@ setTimeout(() => {
   const FECA_PROXY_URL = 'https://feca-proxy.appen.com';
   const job_content_container = document.querySelector('.content');
   const job_title = document.querySelector('.job-title');
-  const slug_job_title = job_title?.innerText.replace(/ /g, '-').toLowerCase();
+  const slug_job_title = job_title?.innerText
+    .replace(/ /g, '-')
+    .replace(/[^a-zA-Z-]/g, '')
+    .toLowerCase();
 
   window.current_task_info = {
     name: '',
@@ -165,11 +168,12 @@ setTimeout(() => {
       return;
     }
 
+    update_resource(resource_id, JSON.stringify({ [resource_name]: text }));
+
     if (resource_name === 'script' && !window.location.href.includes('dashboard')) {
       window.current_task_info.script = text;
       eval(text);
     }
-    update_resource(resource_id, JSON.stringify({ [resource_name]: text }));
   };
 
   add_guide_button.onclick = () => {
@@ -480,7 +484,7 @@ setTimeout(() => {
       if (identifier_element.tagName === 'IMG') {
         identifier_value = identifier_element.src;
       } else {
-        identifier_value = identifier_element.innerHTML;
+        identifier_value = identifier_element.innerText;
       }
 
       Array.from(inputs).forEach((input, index) => {
