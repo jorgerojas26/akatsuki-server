@@ -1,4 +1,4 @@
-window.addEventListener('load', function () {
+setTimeout(function () {
   if (window.location.href.includes('taskNotifier')) {
     var all_earnings = 0;
 
