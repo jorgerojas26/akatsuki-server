@@ -19,7 +19,7 @@ const GET_ALL_NEEDED_INFO = async (req, res) => {
       const keywords_id = selector_info.keywords_id;
       const script_id = selector_info.script_id;
 
-      const actual_guide_info = await Guide.findOne({ _id: selector_info.guide_id }, { _id: 0, __v: 0 });
+      const actual_guide_info = await Guide.findOne({ _id: selector_info.guide_id }, { __v: 0 });
       neededInfo.current_task_guide_info = actual_guide_info;
 
       if (keywords_id !== guide_id) {
@@ -62,6 +62,7 @@ const GET_GUIDE_BY_ID = async (req, res) => {
     if (!guide) {
       return res.status(404).json({ error: { message: 'Guide not found' } });
     }
+    console.log(JSON.parse(guide.collections).reverse());
 
     res.status(200).json(guide);
   } catch (error) {
@@ -123,6 +124,27 @@ const UPDATE_GUIDE = async (req, res) => {
   }
 };
 
+const ADD_ITEM_TO_GUIDE = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { task } = req.body;
+
+    const guide = await Guide.findOne({ _id: id });
+    if (!guide) {
+      return res.status(404).json({ error: { message: 'Guide not found' } });
+    }
+
+    const collections = JSON.parse(guide.collections);
+    collections.push(task);
+    guide.collections = JSON.stringify(collections);
+
+    await guide.save();
+    res.status(200).json(guide);
+  } catch (error) {
+    res.status(500).json({ error: { message: error.message } });
+  }
+};
+
 const DELETE_GUIDE = async (req, res) => {
   try {
     const { id } = req.params;
@@ -147,5 +169,6 @@ export default {
   GET_ALL_NEEDED_INFO,
   CREATE_GUIDE,
   UPDATE_GUIDE,
+  ADD_ITEM_TO_GUIDE,
   DELETE_GUIDE,
 };

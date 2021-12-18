@@ -2,7 +2,7 @@ GET http://localhost:3000/guides
 
 GET http://localhost:3000/guides?namesOnly=true
 
-GET http://localhost:3000/guides/61b411bd6bda96f16e5d1b6a
+GET http://localhost:3000/guides/61bcd6c37143bfe3b669f818
 
 GET http://localhost:3000/guides/needed/annotate-and-categorize-objects-in-an-image-using-a-bounding-box
 
@@ -13,6 +13,16 @@ Content-Type: application/json
   "name": "Hola, soy una guia",
   "keywords": ["hola", "soy", "una", "guia"],
   "collections": ["entrada1", "entrada2"]
+}
+
+POST http://localhost:3000/guides/61bcd6c37143bfe3b669f818
+Content-Type: application/json
+
+{
+  "task": {
+    "identifier": "imageUrl",
+    "response": "this is a response"
+  }
 }
 
 PATCH http://localhost:3000/guides/Youtube
