@@ -14,7 +14,7 @@ setTimeout(() => {
     script: '',
   };
 
-  const visualizer_modal_template = ` <div id="myModal" class="custom-modal"> <div class="custom-modal-content"> <div class="custom-modal-header"> <span class="close">&times;</span> <h2 id='visualizer-modal-title'>Resource name</h2> </div> <div class="custom-modal-body"> <textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="text-content" placeholder="Escriba el contenido" style='height: 550px; width: calc(100% - 15px); resize: none;'></textarea> </div> <div class="custom-modal-footer"> <div> <input type='button' id='delete-button' style='background: red; color: white;' value='Delete' /> </div> <div> <input type='submit' id='save-button' style='background: green; color: white;' value='Save'/> <input type='button' id='cancel-button' value='Cancel' /> </div> </div> </div> </div> `;
+  const visualizer_modal_template = ` <div id="myModal" class="custom-modal"> <div class="custom-modal-content"> <div class="custom-modal-header"> <span class="close">&times;</span> <h2 id='visualizer-modal-title'>Resource name</h2></div> <div class="custom-modal-body"> <textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="text-content" placeholder="Escriba el contenido" style='height: 550px; width: calc(100% - 15px); resize: none;'></textarea> </div> <div class="custom-modal-footer"> <div> <input type='button' id='delete-button' style='background: red; color: white;' value='Delete' /> </div> <div> <input type='submit' id='save-button' style='background: green; color: white;' value='Save'/> <input type='button' id='cancel-button' value='Cancel' /> </div> </div> </div> </div> `;
   document.body.insertAdjacentHTML('beforeend', visualizer_modal_template);
 
   const create_guide_modal_template = ` <div id="create_guide_modal" class="custom-modal"> <div class="custom-modal-content"> <div class="custom-modal-header"> <span class="close">&times;</span> <h2 id='create-guide-modal-title'>Nueva guía</h2> </div> <form id='create_guide_form'> <div class="custom-modal-body"> <div style='padding: 10px; margin: 10px'> <label for="guide_name">* Nombre de la guía</label> <input type="text" id="guide_name" placeholder="Nombre de la guía" value='${
@@ -136,7 +136,9 @@ setTimeout(() => {
 
     visualizer_save_button.setAttribute('data-resource-id', selected.value);
     visualizer_save_button.setAttribute('data-resource-name', 'collections');
-    visualize_resource(JSON.stringify(JSON.parse(window.current_task_info.collections), null, 2), title);
+    const parsedCollections = JSON.parse(window.current_task_info.collections);
+    const resourceCount = parsedCollections.length;
+    visualize_resource(JSON.stringify(JSON.parse(parsedCollections), null, 2), title, resourceCount);
   };
 
   view_keyword_button.onclick = () => {
@@ -484,7 +486,7 @@ setTimeout(() => {
       if (identifier_element.tagName === 'IMG') {
         identifier_value = identifier_element.src;
       } else {
-        identifier_value = identifier_element.innerText;
+        identifier_value = identifier_element.innerText.replace('"', '');
       }
 
       Array.from(inputs).forEach((input, index) => {
