@@ -138,7 +138,7 @@ setTimeout(() => {
     visualizer_save_button.setAttribute('data-resource-name', 'collections');
     const parsedCollections = JSON.parse(window.current_task_info.collections);
     const resourceCount = parsedCollections.length;
-    visualize_resource(JSON.stringify(JSON.parse(parsedCollections), null, 2), title, resourceCount);
+    visualize_resource(JSON.stringify(parsedCollections), title, resourceCount);
   };
 
   view_keyword_button.onclick = () => {
@@ -619,4 +619,3 @@ select {
 }
 `);
 });
-
