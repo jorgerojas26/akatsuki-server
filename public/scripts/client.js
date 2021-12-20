@@ -139,7 +139,7 @@ setTimeout(() => {
     visualizer_save_button.setAttribute('data-resource-name', 'collections');
     const parsedCollections = JSON.parse(window.current_task_info.collections);
     const collections_count = parsedCollections.length;
-    visualize_resource(JSON.stringify(parsedCollections), title, collections_count);
+    visualize_resource(JSON.stringify(parsedCollections, null, 2), title, collections_count);
   };
 
   view_keyword_button.onclick = () => {
