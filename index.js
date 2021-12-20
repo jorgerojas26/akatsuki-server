@@ -11,7 +11,7 @@ import guidesRoutes from './routes/guides/guides.js';
 import taskGuideInfoRoutes from './routes/task-guide-info/task-guide-info.js';
 
 const app = express();
-const httpServer = null;
+let httpServer = null;
 
 if (process.env.NODE_ENV === 'development') {
   httpServer = createServer(app);
