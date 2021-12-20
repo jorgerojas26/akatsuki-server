@@ -14,7 +14,7 @@ setTimeout(() => {
     script: '',
   };
 
-  const visualizer_modal_template = ` <div id="myModal" class="custom-modal"> <div class="custom-modal-content"> <div class="custom-modal-header"> <span class="close">&times;</span> <h2 id='visualizer-modal-title'>Resource name</h2></div> <div class="custom-modal-body"> <textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="text-content" placeholder="Escriba el contenido" style='height: 550px; width: calc(100% - 15px); resize: none;'></textarea> </div> <div class="custom-modal-footer"> <div> <input type='button' id='delete-button' style='background: red; color: white;' value='Delete' /> </div> <div> <input type='submit' id='save-button' style='background: green; color: white;' value='Save'/> <input type='button' id='cancel-button' value='Cancel' /> </div> </div> </div> </div> `;
+  const visualizer_modal_template = ` <div id="myModal" class="custom-modal"> <div class="custom-modal-content"> <div class="custom-modal-header"> <span class="close">&times;</span> <h2 id='visualizer-modal-title'>Resource name</h2></div> <div class="custom-modal-body"> <textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="text-content" placeholder="Escriba el contenido" style='height: 550px; width: calc(100% - 15px); resize: none;'></textarea> <span id='TQCount' style='font-style=italic;'></span></div> <div class="custom-modal-footer"> <div> <input type='button' id='delete-button' style='background: red; color: white;' value='Delete' /> </div> <div> <input type='submit' id='save-button' style='background: green; color: white;' value='Save'/> <input type='button' id='cancel-button' value='Cancel' /> </div> </div> </div> </div> `;
   document.body.insertAdjacentHTML('beforeend', visualizer_modal_template);
 
   const create_guide_modal_template = ` <div id="create_guide_modal" class="custom-modal"> <div class="custom-modal-content"> <div class="custom-modal-header"> <span class="close">&times;</span> <h2 id='create-guide-modal-title'>Nueva guía</h2> </div> <form id='create_guide_form'> <div class="custom-modal-body"> <div style='padding: 10px; margin: 10px'> <label for="guide_name">* Nombre de la guía</label> <input type="text" id="guide_name" placeholder="Nombre de la guía" value='${
@@ -83,6 +83,7 @@ setTimeout(() => {
 
   // MODAL ELEMENTS
   const visualizer_modal_title = visualizer_modal.querySelector('#visualizer-modal-title');
+  const visualizer_modal_tq_count = visualizer_modal.querySelector('#TQCount');
   const visualizer_modal_textarea = visualizer_modal.querySelector('#text-content');
   const visualizer_close_button = visualizer_modal.querySelector('.close');
   const visualizer_delete_button = visualizer_modal.querySelector('#delete-button');
@@ -137,8 +138,8 @@ setTimeout(() => {
     visualizer_save_button.setAttribute('data-resource-id', selected.value);
     visualizer_save_button.setAttribute('data-resource-name', 'collections');
     const parsedCollections = JSON.parse(window.current_task_info.collections);
-    const resourceCount = parsedCollections.length;
-    visualize_resource(JSON.stringify(parsedCollections), title, resourceCount);
+    const collections_count = parsedCollections.length;
+    visualize_resource(JSON.stringify(parsedCollections), title, collections_count);
   };
 
   view_keyword_button.onclick = () => {
@@ -225,8 +226,10 @@ setTimeout(() => {
     });
   }
 
-  function visualize_resource(resource_text, title) {
+  function visualize_resource(resource_text, title, resource_count) {
     visualizer_modal_title.innerHTML = title;
+    if (resource_count) visualizer_modal_tq_count.innerText = resource_count;
+
     if (resource_text) {
       visualizer_modal_textarea.value = '';
       visualizer_modal_textarea.value = resource_text;
