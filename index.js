@@ -1,7 +1,9 @@
 import 'dotenv/config';
 import express from 'express';
 import { createServer } from 'http';
+import { createServer as createHttpsServer } from 'https';
 import { Server } from 'socket.io';
+import fs from 'fs';
 import './database.js';
 
 // ROUTES
@@ -9,7 +11,18 @@ import guidesRoutes from './routes/guides/guides.js';
 import taskGuideInfoRoutes from './routes/task-guide-info/task-guide-info.js';
 
 const app = express();
-const httpServer = createServer(app);
+const httpServer = null;
+
+if (process.env.NODE_ENV === 'development') {
+  httpServer = createServer(app);
+} else {
+  const credentials = {
+    key: fs.readFileSync(process.env.SSL_KEY_FILE_PATH),
+    cert: fs.readFileSync(process.env.SSL_CERT_FILE_PATH),
+  };
+
+  httpServer = createHttpsServer(credentials, app);
+}
 
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ extended: true, limit: '100mb' }));
@@ -98,5 +111,5 @@ io.on('connection', (socket) => {
 app.use(express.static('public'));
 
 httpServer.listen(process.env.PORT || 3000, () => {
-  console.log('listening on *:3000');
+  console.log('listening on ', process.env.PORT || 3000);
 });
