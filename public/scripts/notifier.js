@@ -21,6 +21,7 @@ setTimeout(function () {
     socket.on('includeList', ({ action, item }) => {
       let include_list = GM_getValue('includeList') || [];
       if (action === 'create') {
+        const exists = include_list.find((e) => e._id === item._id);
         include_list.push(item);
       } else if (action === 'update') {
         include_list = include_list.map((i) => {
