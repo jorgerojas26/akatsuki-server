@@ -87,7 +87,7 @@ setTimeout(() => {
   const visualizer_modal_editor = visualizer_modal.querySelector('#json-editor-container');
   const visualizer_textarea = visualizer_modal.querySelector('#textarea-content');
   const json_editor = new JSONEditor(visualizer_modal_editor, {
-    mode: 'tree',
+    mode: 'code',
   });
 
   const visualizer_close_button = visualizer_modal.querySelector('.close');
@@ -142,7 +142,7 @@ setTimeout(() => {
     visualizer_save_button.setAttribute('data-resource-name', 'collections');
     const parsedCollections = JSON.parse(window.current_task_info.collections);
     const collections_count = parsedCollections.length;
-    json_editor.setMode('tree');
+    //json_editor.setMode('tree');
     visualizer_textarea.style.display = 'none';
     visualizer_modal_editor.style.display = 'block';
     visualize_resource(parsedCollections, title, collections_count);
@@ -154,7 +154,7 @@ setTimeout(() => {
 
     visualizer_save_button.setAttribute('data-resource-id', selected.value);
     visualizer_save_button.setAttribute('data-resource-name', 'keywords');
-    json_editor.setMode('tree');
+    //json_editor.setMode('tree');
     visualizer_textarea.style.display = 'none';
     visualizer_modal_editor.style.display = 'block';
     visualize_resource(JSON.parse(window.current_task_info.keywords), title);
@@ -166,7 +166,6 @@ setTimeout(() => {
 
     visualizer_save_button.setAttribute('data-resource-id', selected.value);
     visualizer_save_button.setAttribute('data-resource-name', 'script');
-    json_editor.setMode('code');
     visualizer_textarea.style.display = 'block';
     visualizer_modal_editor.style.display = 'none';
     visualize_resource(window.current_task_info.script, title);
@@ -241,7 +240,7 @@ setTimeout(() => {
   function visualize_resource(resource_text, title, resource_count) {
     visualizer_modal_title.innerHTML = title;
 
-    if (resource_count) visualizer_modal_tq_count.innerText = resource_count;
+    if (resource_count) visualizer_modal_tq_count.innerText = `Number of entries ${resource_count}`
 
     if (resource_text) {
       if (visualizer_textarea.style.display === 'none') {
@@ -636,7 +635,6 @@ select {
 }
 
 #TQCount {
-  display: none;
   width: 100%;
   text-align: center;
   margin-bottom: 15px;
