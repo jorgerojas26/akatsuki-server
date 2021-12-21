@@ -634,5 +634,13 @@ select {
   gap: 3px;
   margin: 5px;
 }
+
+#TQCount {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
 `);
 });
