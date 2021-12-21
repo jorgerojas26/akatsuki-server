@@ -14,7 +14,7 @@ setTimeout(() => {
     script: '',
   };
 
-  const visualizer_modal_template = ` <div id="myModal" class="custom-modal"> <div class="custom-modal-content"> <div class="custom-modal-header"> <span class="close">&times;</span> <h2 id='visualizer-modal-title'>Resource name</h2></div> <div class="custom-modal-body"> <textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="text-content" placeholder="Escriba el contenido" style='height: 550px; width: calc(100% - 15px); resize: none;'></textarea> <span id='TQCount' style='font-style=italic;'></span></div> <div class="custom-modal-footer"> <div> <input type='button' id='delete-button' style='background: red; color: white;' value='Delete' /> </div> <div> <input type='submit' id='save-button' style='background: green; color: white;' value='Save'/> <input type='button' id='cancel-button' value='Cancel' /> </div> </div> </div> </div> `;
+  const visualizer_modal_template = ` <div id="myModal" class="custom-modal"> <div class="custom-modal-content"> <div class="custom-modal-header"> <span class="close">&times;</span> <h2 id='visualizer-modal-title'>Resource name</h2></div> <div class="custom-modal-body"><textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="textarea-content" placeholder="Escriba el contenido" style='display=none; height: 550px; width: calc(100% - 15px); resize: none;'></textarea><div id="json-editor-container" style='display=none; height: 550px; width: calc(100% - 15px); resize: none;'></div> <span id='TQCount' style='font-style=italic;'></span></div> <div class="custom-modal-footer"> <div> <input type='button' id='delete-button' style='background: red; color: white;' value='Delete' /> </div> <div> <input type='submit' id='save-button' style='background: green; color: white;' value='Save'/> <input type='button' id='cancel-button' value='Cancel' /> </div> </div> </div> </div> `;
   document.body.insertAdjacentHTML('beforeend', visualizer_modal_template);
 
   const create_guide_modal_template = ` <div id="create_guide_modal" class="custom-modal"> <div class="custom-modal-content"> <div class="custom-modal-header"> <span class="close">&times;</span> <h2 id='create-guide-modal-title'>Nueva guía</h2> </div> <form id='create_guide_form'> <div class="custom-modal-body"> <div style='padding: 10px; margin: 10px'> <label for="guide_name">* Nombre de la guía</label> <input type="text" id="guide_name" placeholder="Nombre de la guía" value='${
@@ -84,7 +84,12 @@ setTimeout(() => {
   // MODAL ELEMENTS
   const visualizer_modal_title = visualizer_modal.querySelector('#visualizer-modal-title');
   const visualizer_modal_tq_count = visualizer_modal.querySelector('#TQCount');
-  const visualizer_modal_textarea = visualizer_modal.querySelector('#text-content');
+  const visualizer_modal_editor = visualizer_modal.querySelector('#json-editor-container');
+  const visualizer_textarea = visualizer_modal.querySelector('#textarea-content');
+  const json_editor = new JSONEditor(visualizer_modal_editor, {
+    mode: 'tree',
+  });
+
   const visualizer_close_button = visualizer_modal.querySelector('.close');
   const visualizer_delete_button = visualizer_modal.querySelector('#delete-button');
   const visualizer_save_button = visualizer_modal.querySelector('#save-button');
@@ -114,11 +119,9 @@ setTimeout(() => {
   };
 
   visualizer_close_button.onclick = () => {
-    visualizer_modal_textarea.value = '';
     visualizer_modal.style.display = 'none';
   };
   visualizer_cancel_button.onclick = () => {
-    visualizer_modal_textarea.value = '';
     visualizer_modal.style.display = 'none';
   };
   create_guide_close_button.onclick = () => {
@@ -139,7 +142,10 @@ setTimeout(() => {
     visualizer_save_button.setAttribute('data-resource-name', 'collections');
     const parsedCollections = JSON.parse(window.current_task_info.collections);
     const collections_count = parsedCollections.length;
-    visualize_resource(JSON.stringify(parsedCollections, null, 2), title, collections_count);
+    json_editor.setMode('tree');
+    visualizer_textarea.style.display = 'none';
+    visualizer_modal_editor.style.display = 'block';
+    visualize_resource(parsedCollections, title, collections_count);
   };
 
   view_keyword_button.onclick = () => {
@@ -148,7 +154,10 @@ setTimeout(() => {
 
     visualizer_save_button.setAttribute('data-resource-id', selected.value);
     visualizer_save_button.setAttribute('data-resource-name', 'keywords');
-    visualize_resource(JSON.stringify(JSON.parse(window.current_task_info.keywords), null, 2), title);
+    json_editor.setMode('tree');
+    visualizer_textarea.style.display = 'none';
+    visualizer_modal_editor.style.display = 'block';
+    visualize_resource(JSON.parse(window.current_task_info.keywords), title);
   };
 
   view_script_button.onclick = () => {
@@ -157,13 +166,16 @@ setTimeout(() => {
 
     visualizer_save_button.setAttribute('data-resource-id', selected.value);
     visualizer_save_button.setAttribute('data-resource-name', 'script');
+    json_editor.setMode('code');
+    visualizer_textarea.style.display = 'block';
+    visualizer_modal_editor.style.display = 'none';
     visualize_resource(window.current_task_info.script, title);
   };
 
   visualizer_save_button.onclick = () => {
-    const text = visualizer_modal_textarea.value;
     const resource_id = visualizer_save_button.getAttribute('data-resource-id');
     const resource_name = visualizer_save_button.getAttribute('data-resource-name');
+    const text = resource_name !== 'script' ? json_editor.getText() : visualizer_textarea.value;
 
     if ((resource_name === 'collections' || resource_name === 'keywords') && !is_json_valid(text)) {
       visualizer_modal.style.display = 'none';
@@ -228,13 +240,15 @@ setTimeout(() => {
 
   function visualize_resource(resource_text, title, resource_count) {
     visualizer_modal_title.innerHTML = title;
+
     if (resource_count) visualizer_modal_tq_count.innerText = resource_count;
 
     if (resource_text) {
-      visualizer_modal_textarea.value = '';
-      visualizer_modal_textarea.value = resource_text;
-    } else {
-      visualizer_modal_textarea.placeholder = 'No resource to visualize';
+      if (visualizer_textarea.style.display === 'none') {
+        json_editor.set(resource_text);
+      } else {
+        visualizer_textarea.value = resource_text;
+      }
     }
     visualizer_modal.style.display = 'flex';
   }
@@ -440,7 +454,7 @@ setTimeout(() => {
           if (response.status === 200) {
             window.current_task_info = response.response;
             showMessage('Successfully updated', 'green');
-            visualizer_modal_textarea.value = '';
+            visualizer_modal_editor.value = '';
           } else {
             showMessage('Failed to update ' + response.response.error.message, 'red');
           }
