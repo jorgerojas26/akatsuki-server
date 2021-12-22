@@ -522,14 +522,17 @@ setTimeout(() => {
         }
       });
 
-      const response = add_item_to_guide({
-        identifier_element: window.job_identifier,
+      const new_item = {
         identifier_value,
         responses: inputs_response,
-      });
+      }
+      const response = add_item_to_guide(new_item);
 
       if (!response.error) {
         wrapper.style.background = 'lightgreen';
+	const collections = JSON.parse(window.current_task_info.collections);
+	collections.push(new_item)
+	window.current_task_info.collections = JSON.stringify(collections)
       }
     };
     wrapper.append(button);
