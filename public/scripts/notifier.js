@@ -1,3 +1,4 @@
+window.server_include_list = [];
 setTimeout(function () {
   if (window.location.href.includes('taskNotifier')) {
     var all_earnings = 0;
@@ -18,34 +19,27 @@ setTimeout(function () {
       earnings_badge.innerText = all_earnings;
     });
 
-    socket.on('connect', () => {
-      socket.emit('fetch_include_list', (server_include_list) => {
-        const local_include_list = GM_getValue('includeList') || [];
-        const merged_list = _.merge(server_include_list, local_include_list);
-        GM_setValue('includeList', merged_list);
-      });
+    socket.on('connect', async () => {
+      const response = await fetch_server_include_list();
+      window.server_include_list = response;
     });
 
     socket.on('includeList', ({ action, item }) => {
-      let local_include_list = GM_getValue('includeList') || [];
       if (action === 'create') {
-        const exists = local_include_list.find((e) => e._id === item._id);
+        const exists = window.server_include_list.find((e) => e._id === item._id);
         if (!exists) {
-          local_include_list.push(item);
+          window.server_include_list.push(item);
         }
       } else if (action === 'update') {
-        local_include_list = local_include_list.map((i) => {
+        window.server_include_list = window.server_include_list.map((i) => {
           if (i.task === item.task) {
             return item;
           }
-
           return i;
         });
       } else if (action === 'delete') {
-        local_include_list = local_include_list.filter((i) => i.task === item.task);
+        window.server_include_list = window.server_include_list.filter((i) => i.task === item.task);
       }
-
-      GM_setValue('includeList', local_include_list);
     });
 
     //base de url de la api
@@ -143,8 +137,8 @@ setTimeout(function () {
                           var link_tarea =
                             'https://account.appen.com/channels/feca/tasks/' + tarea_id + '?secret=' + secret_key_get;
                           var lista_incluidos = GM_getValue('includeList') || [];
-
-                          lista_incluidos.forEach((elemts) => {
+                          console.log(lista_incluidos.concat(window.server_include_list));
+                          lista_incluidos.concat(window.server_include_list).forEach((elemts) => {
                             if (tarea_nombre.toLowerCase().includes(elemts.task.toLowerCase())) {
                               if (!buscador_existe(tarea_id, link_tarea)) {
                                 if (elemts.active) {
@@ -287,7 +281,6 @@ setTimeout(function () {
           url: `${SERVER_URL}/include-list`,
           responseType: 'json',
           onload: function (response) {
-            console.log(response.response);
             resolve(response.response);
           },
         });
@@ -588,14 +581,7 @@ setTimeout(function () {
 
     async function fn_btn_include() {
       var include_list = GM_getValue('includeList') || [];
-      let server_include_list = (await fetch_server_include_list()) || [];
-
-      server_include_list.forEach((server_item) => {
-        const is_on_local = include_list.find((local_item) => local_item.task === server_item.task);
-        if (!is_on_local) {
-          include_list.push(server_item);
-        }
-      });
+      console.log(window.server_include_list);
 
       let element_include = document.createElement('div');
       element_include.setAttribute('id', 'includeListButtonsWrapper');
@@ -604,9 +590,8 @@ setTimeout(function () {
       const message_info = document.createElement('div');
       message_info.className = 'alert alert-danger';
 
-      include_list.forEach(function (iterator, indice) {
+      include_list.concat(window.server_include_list).forEach(function (iterator, indice) {
         let texto = recortar_texto(iterator.task);
-        const is_task_on_server = server_include_list.find((i) => i.task === iterator.task);
         let container_link = document.createElement('div');
         container_link.classList.add('col-lg-4', 'my-1');
 
@@ -628,9 +613,9 @@ setTimeout(function () {
         link.style.fontWeight = 'bold';
         link.style.marginLeft = '7px';
         link.innerHTML = texto;
-        if (is_task_on_server) {
-          link.style.background = is_task_on_server.active ? 'lightgreen' : 'red';
-          link.setAttribute('data-server-id', is_task_on_server._id);
+        if (iterator._id) {
+          link.style.background = iterator.active ? 'lightgreen' : 'red';
+          link.setAttribute('data-server-id', iterator._id);
         }
 
         container_link.appendChild(check_link);
@@ -642,23 +627,13 @@ setTimeout(function () {
         if (evnt.target.type === 'checkbox') {
           if (evnt.ctrlKey) {
             const task_link = evnt.target.parentElement.children[1];
-            const is_task_on_server = server_include_list.find((i) => i.task === task_link.innerText);
             const response = await update_server_include_list(task_link.getAttribute('data-server-id'), {
               task: task_link.innerText,
               active: evnt.target.checked,
             });
             if (!response.error) {
-              let found = false;
-              server_include_list = server_include_list.map((item) => {
-                if (item.task === response.task) {
-                  found = true;
-                  return response;
-                }
-                return item;
-              });
-
-              if (!found) server_include_list.push(response);
-
+              include_list = include_list.filter((item) => item.task !== task_link.innerText);
+              GM_setValue('includeList', include_list);
               task_link.style.background = evnt.target.checked ? 'lightgreen' : 'red';
               task_link.setAttribute('data-server-id', response._id);
             } else {
@@ -666,10 +641,11 @@ setTimeout(function () {
               alert_message.classList.add('alert-danger');
               alert_message.innerHTML = response.error.message;
             }
+          } else {
+            include_list[evnt.target.dataset.indice].active = evnt.target.checked;
+            GM_setValue('includeList', include_list);
+            get_current_date_server();
           }
-          include_list[evnt.target.dataset.indice].active = evnt.target.checked;
-          GM_setValue('includeList', include_list);
-          get_current_date_server();
         } else if (evnt.target.dataset.indice !== undefined) {
           bootbox.confirm(
             'Are you sure you want to delete <b>"' + evnt.target.dataset.title + '"</b> ?',
