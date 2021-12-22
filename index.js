@@ -3,6 +3,7 @@ import express from 'express';
 import { createServer } from 'http';
 import { createServer as createHttpsServer } from 'https';
 import { Server } from 'socket.io';
+import IncludeList from './models/IncludeList.js';
 import fs from 'fs';
 import './database.js';
 
@@ -41,45 +42,6 @@ includeListRoutes(io);
 
 app.use('/include-list', includeListRouter);
 
-io.of('/jorge').on('connection', (socket) => {
-  socket.join('jorge');
-  console.log('jorge has been connected a client with id: ', socket.id);
-
-  socket.on('fetch_all_earnings', () => {
-    io.to('jorge').emit('fetch_earnings');
-  });
-
-  socket.on('sum_earnings', (earnings) => {
-    io.to('jorge').emit('fetch_earnings');
-  });
-});
-
-io.of('/junior').on('connection', (socket) => {
-  socket.join('junior');
-  console.log('junior has been connected a client with id: ', socket.id);
-
-  socket.on('fetch_all_earnings', () => {
-    io.to('junior').emit('fetch_earnings');
-  });
-
-  socket.on('sum_earnings', (earnings) => {
-    io.to('junior').emit('fetch_earnings');
-  });
-});
-
-io.of('/angel').on('connection', (socket) => {
-  socket.join('angel');
-  console.log('angel has been connected a client with id: ', socket.id);
-
-  socket.on('fetch_all_earnings', () => {
-    io.to('angel').emit('fetch_earnings');
-  });
-
-  socket.on('sum_earnings', (earnings) => {
-    io.to('angel').emit('fetch_earnings');
-  });
-});
-
 io.on('connection', (socket) => {
   console.log('socket connected', socket.id);
 
@@ -105,6 +67,12 @@ io.on('connection', (socket) => {
 
   socket.on('sum_earnings', (earnings) => {
     io.emit('sum_earnings', earnings);
+  });
+
+  socket.on('fetch_include_list', async (callback) => {
+    const includeList = await IncludeList.find({}, { __v: 0 });
+    console.log(includeList);
+    callback(includeList);
   });
 });
 

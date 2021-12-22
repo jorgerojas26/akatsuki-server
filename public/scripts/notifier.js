@@ -2,7 +2,7 @@ setTimeout(function () {
   if (window.location.href.includes('taskNotifier')) {
     var all_earnings = 0;
 
-    namespaced_socket.on('fetch_earnings', async () => {
+    socket.on('fetch_earnings', async () => {
       const earnings_object = await fetch_earnings();
       const earnings_badge = document.querySelector('#earnings_badge');
       earnings_badge.innerText = '0.00';
@@ -10,7 +10,7 @@ setTimeout(function () {
       namespaced_socket.emit('sum_earnings', earnings_object?.available / 100);
     });
 
-    namespaced_socket.on('sum_earnings', (earnings) => {
+    socket.on('sum_earnings', (earnings) => {
       console.log(all_earnings, earnings);
       const earnings_badge = document.querySelector('#earnings_badge');
       all_earnings += earnings;
@@ -18,13 +18,23 @@ setTimeout(function () {
       earnings_badge.innerText = all_earnings;
     });
 
+    socket.on('connect', () => {
+      socket.emit('fetch_include_list', (server_include_list) => {
+        const local_include_list = GM_getValue('includeList') || [];
+        const merged_list = _.merge(server_include_list, local_include_list);
+        GM_setValue('includeList', merged_list);
+      });
+    });
+
     socket.on('includeList', ({ action, item }) => {
-      let include_list = GM_getValue('includeList') || [];
+      let local_include_list = GM_getValue('includeList') || [];
       if (action === 'create') {
-        const exists = include_list.find((e) => e._id === item._id);
-        include_list.push(item);
+        const exists = local_include_list.find((e) => e._id === item._id);
+        if (!exists) {
+          local_include_list.push(item);
+        }
       } else if (action === 'update') {
-        include_list = include_list.map((i) => {
+        local_include_list = local_include_list.map((i) => {
           if (i.task === item.task) {
             return item;
           }
@@ -32,10 +42,10 @@ setTimeout(function () {
           return i;
         });
       } else if (action === 'delete') {
-        include_list = include_list.filter((i) => i.task === item.task);
+        local_include_list = local_include_list.filter((i) => i.task === item.task);
       }
 
-      GM_setValue('includeList', include_list);
+      GM_setValue('includeList', local_include_list);
     });
 
     //base de url de la api
