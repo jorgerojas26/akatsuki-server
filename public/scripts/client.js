@@ -463,19 +463,23 @@ setTimeout(() => {
 
     function get_job_title_in_support_form() {
         const support_contact_form = document.querySelector('#contributor-support-contact-form');
-        const support_contact_url = new URL(support_contact_form?.getAttribute('data-src'));
-        const support_job_title = support_contact_url?.searchParams
-            ?.get('ticket[custom_job_title]')
-            .replace(/\+/g, ' ');
-        const support_job_title_slug = support_job_title
-            ?.replace(/ /g, '-')
-            .replace(/[^a-zA-Z-]/g, '')
-            .toLowerCase();
+	if(support_contact_form){
+		const support_contact_url = new URL(support_contact_form?.getAttribute('data-src'));
+		const support_job_title = support_contact_url?.searchParams
+			?.get('ticket[custom_job_title]')
+			.replace(/\+/g, ' ');
+		const support_job_title_slug = support_job_title
+			?.replace(/ /g, '-')
+			.replace(/[^a-zA-Z-]/g, '')
+			.toLowerCase();
 
-        return {
-            title: support_job_title,
-            slug: support_job_title_slug,
-        };
+		return {
+			title: support_job_title,
+			slug: support_job_title_slug,
+		};
+	}
+
+	return null
     }
 
     function post_to_discord(blob, filename) {
