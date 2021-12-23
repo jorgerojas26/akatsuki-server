@@ -134,7 +134,7 @@ const ADD_ITEM_TO_GUIDE = async (req, res) => {
       return res.status(404).json({ error: { message: 'Guide not found' } });
     }
 
-    const collections = JSON.parse(guide.collections);
+    const collections = JSON.parse(guide.collections).filter((item) => item.identifier_value !== task.identifier_value);
     collections.push(task);
     guide.collections = JSON.stringify(collections);
 
