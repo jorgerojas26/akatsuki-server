@@ -1,6 +1,6 @@
 setTimeout(() => {
     const discord_webhook_url =
-        'https://discord.com/api/webhooks/923423356244594698/e3meXjdTqgm-UWxVpbh0mIDF7ch7wg16xtUp8f-u0-4tdBfpJ2OMjmYa9PnGbEjtEwa9';
+        'https://discord.com/api/webhooks/923678367134416986/TmNQLy2SEwGi9LzJjRX9H5hA4I1CxR85thIdMU0h7VyB4W1xKDF--BRMK8-D4R0nHN_Y';
     const job_content_container = document.querySelector('.content');
     const missed_form = document.querySelector('#job_units_missed');
     const job_title = document.querySelector('.job-title');
@@ -537,8 +537,13 @@ setTimeout(() => {
     if (missed_form?.action.includes('/contend')) {
         const correction_html = document.querySelector('html').cloneNode(true);
         const correction_scripts = correction_html.querySelectorAll('script');
-        correction_scripts[7].parentElement.removeChild(correction_scripts[7]);
-
+	    let script_index = null;
+	    Array.from(correction_scripts).forEach((script, index) => {
+		    if(script.innerHTML.includes('show answer')){
+			    script_index = index;
+		    }
+	    })
+	    correction_scripts[script_index].parentElement.removeChild(correction_scripts[script_index]);
         const correction_job_title = get_job_title_in_support_form()?.slug || 'correction';
 
         const html_blob = new Blob([correction_html.outerHTML], { type: 'text/html' });
