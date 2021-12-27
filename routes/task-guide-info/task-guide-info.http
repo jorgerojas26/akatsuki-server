@@ -1,6 +1,6 @@
-GET http://localhost:3000/task-guide-info/annotate-and-categorize-objects-in-an-image-using-a-bounding-box
+GET http://localhost:3001/task-guide-info/rate-content-of-animated-gifs-adult-content
 
-PATCH http://localhost:3000/task-guide-info/annotate-and-categorize-objects-in-an-image-using-a-bounding-box
+PATCH http://localhost:3001/task-guide-info/annotate-and-categorize-objects-in-an-image-using-a-bounding-box
 Content-Type: application/json
 
 {

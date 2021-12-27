@@ -1,12 +1,12 @@
-GET http://localhost:3000/guides
+GET http://localhost:3001/guides
 
-GET http://localhost:3000/guides?namesOnly=true
+GET http://localhost:3001/guides?namesOnly=true
 
-GET http://localhost:3000/guides/61bcd6c37143bfe3b669f818
+GET http://localhost:3001/guides/61bcd6c37143bfe3b669f818
 
-GET http://localhost:3000/guides/needed/annotate-and-categorize-objects-in-an-image-using-a-bounding-box
+GET http://localhost:3001/guides/needed/rate-content-of-animated-gifs-adult-content
 
-POST http://localhost:3000/guides
+POST http://localhost:3001/guides
 Content-Type: application/json
 
 {
@@ -15,7 +15,7 @@ Content-Type: application/json
   "collections": ["entrada1", "entrada2"]
 }
 
-POST http://localhost:3000/guides/61bcd6c37143bfe3b669f818
+POST http://localhost:3001/guides/61bcd6c37143bfe3b669f818
 Content-Type: application/json
 
 {
@@ -25,7 +25,7 @@ Content-Type: application/json
   }
 }
 
-PATCH http://localhost:3000/guides/Youtube
+PATCH http://localhost:3001/guides/Youtube
 Content-Type: application/json
 
 {
@@ -33,4 +33,4 @@ Content-Type: application/json
   "keywords": []
 }
 
-DELETE http://localhost:3000/guides/61ba8653871e0da1e99d7ba8
+DELETE http://localhost:3001/guides/61ba8653871e0da1e99d7ba8
