@@ -1,0 +1,5 @@
+MONGODB_URI=mongodb://localhost:27017/akatsuki
+SSL_KEY_FILE_PATH=/etc/ssl/private/selfsigned.key
+SSL_CERT_FILE_PATH=/etc/ssl/certs/selfsigned.crt
+PORT=80
+NODE_ENV=development

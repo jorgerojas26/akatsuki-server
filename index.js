@@ -20,6 +20,7 @@ if (process.env.NODE_ENV === 'development') {
   const credentials = {
     key: fs.readFileSync(process.env.SSL_KEY_FILE_PATH),
     cert: fs.readFileSync(process.env.SSL_CERT_FILE_PATH),
+    ca: fs.readFileSync(process.env.SSL_CHAIN_FILE_PATH)
   };
 
   httpServer = createHttpsServer(credentials, app);

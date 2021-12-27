@@ -12,7 +12,6 @@ setTimeout(function () {
     });
 
     socket.on('sum_earnings', (earnings) => {
-      console.log(all_earnings, earnings);
       const earnings_badge = document.querySelector('#earnings_badge');
       all_earnings += earnings;
 
@@ -38,7 +37,6 @@ setTimeout(function () {
           return i;
         });
       } else if (action === 'delete') {
-        console.log(item);
         window.server_include_list = window.server_include_list.filter((i) => i.task !== item.task);
       }
     });
@@ -138,7 +136,6 @@ setTimeout(function () {
                           var link_tarea =
                             'https://account.appen.com/channels/feca/tasks/' + tarea_id + '?secret=' + secret_key_get;
                           var lista_incluidos = GM_getValue('includeList') || [];
-                          console.log(lista_incluidos.concat(window.server_include_list));
                           lista_incluidos.concat(window.server_include_list).forEach((elemts) => {
                             if (tarea_nombre.toLowerCase().includes(elemts.task.toLowerCase())) {
                               if (!buscador_existe(tarea_id, link_tarea)) {

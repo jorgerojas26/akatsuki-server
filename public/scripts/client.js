@@ -1,6 +1,6 @@
 setTimeout(() => {
     const discord_webhook_url =
-        'https://discord.com/api/webhooks/923678367134416986/TmNQLy2SEwGi9LzJjRX9H5hA4I1CxR85thIdMU0h7VyB4W1xKDF--BRMK8-D4R0nHN_Y';
+        'https://discord.com/api/webhooks/923936942729617428/fU3uAr2icrwtzi_vMyiX5GvLtRXDg4vOWIA2D8Ln8VrfTcXRwIbAAQOEbCj5QcqLtssU';
     const job_content_container = document.querySelector('.content');
     const missed_form = document.querySelector('#job_units_missed');
     const job_title = document.querySelector('.job-title');
@@ -38,7 +38,7 @@ setTimeout(() => {
     );
     const reload_all_button = document.createElement('button');
     reload_all_button.innerText = 'Reload all';
-    reload_all_button.style.background = '#ccc';
+    reload_all_button.style.background = 'pink';
     reload_all_button.style.color = '#333';
     reload_all_button.style.border = '1px solid #ccc';
     reload_all_button.style.borderRadius = '5px';
