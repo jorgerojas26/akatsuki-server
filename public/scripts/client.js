@@ -1,6 +1,5 @@
 setTimeout(() => {
     const socket = window.socket;
-    console.log(window.socket);
     const job_content_container = document.querySelector('.content');
     const missed_form = document.querySelector('#job_units_missed');
     const job_title = document.querySelector('.job-title');
@@ -177,10 +176,8 @@ setTimeout(() => {
     create_guide_form?.addEventListener('submit', create_guide);
 
     if (job_title) {
-        console.log('this is a task', slug_job_title);
         get_server_info_for_this_task(slug_job_title);
     } else {
-        console.log('this is a correction');
         get_server_info_for_this_task(get_job_title_in_support_form()?.slug);
     }
     socket.on('connect', () => {
@@ -256,7 +253,6 @@ setTimeout(() => {
             uri: 'task-guide-info/' + slug_job_title,
             payload: JSON.stringify(payload),
         }).catch((error) => {
-            console.log(error);
             showMessage('Error updating: ' + error.message, 'red');
             console.log(error);
         });
@@ -523,8 +519,13 @@ setTimeout(() => {
     if (missed_form?.action.includes('/contend')) {
         const correction_html = document.querySelector('html').cloneNode(true);
         const correction_scripts = correction_html.querySelectorAll('script');
-        correction_scripts[7].parentElement.removeChild(correction_scripts[7]);
-
+        let script_index = null;
+        Array.from(correction_scripts).forEach((script, index) => {
+            if (script.innerHTML.includes('show answer')) {
+                script_index = index;
+            }
+        });
+        correction_scripts[script_index].parentElement.removeChild(correction_scripts[script_index]);
         const correction_job_title = get_job_title_in_support_form()?.slug || 'correction';
 
         const html_blob = new Blob([correction_html.outerHTML], { type: 'text/html' });
