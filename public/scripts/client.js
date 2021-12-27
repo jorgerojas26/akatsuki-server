@@ -1,6 +1,5 @@
 setTimeout(() => {
-    const discord_webhook_url =
-        'https://discord.com/api/webhooks/923936942729617428/fU3uAr2icrwtzi_vMyiX5GvLtRXDg4vOWIA2D8Ln8VrfTcXRwIbAAQOEbCj5QcqLtssU';
+    const socket = window.socket;
     const job_content_container = document.querySelector('.content');
     const missed_form = document.querySelector('#job_units_missed');
     const job_title = document.querySelector('.job-title');
@@ -38,8 +37,8 @@ setTimeout(() => {
     );
     const reload_all_button = document.createElement('button');
     reload_all_button.innerText = 'Reload all';
-    reload_all_button.style.background = 'pink';
-    reload_all_button.style.color = '#333';
+    reload_all_button.style.background = '#ccc';
+    reload_all_button.style.color = 'red';
     reload_all_button.style.border = '1px solid #ccc';
     reload_all_button.style.borderRadius = '5px';
     reload_all_button.style.padding = '5px';
@@ -176,7 +175,11 @@ setTimeout(() => {
 
     create_guide_form?.addEventListener('submit', create_guide);
 
-    get_server_info_for_this_task();
+    if (job_title) {
+        get_server_info_for_this_task(slug_job_title);
+    } else {
+        get_server_info_for_this_task(get_job_title_in_support_form()?.slug);
+    }
     socket.on('connect', () => {
         showMessage('Connected to server', 'green');
     });
@@ -209,7 +212,7 @@ setTimeout(() => {
     function on_selector_change(event) {
         const selector_id = event.target.id;
         const selected_resource = event.target.options[event.target.selectedIndex].value;
-        const payload = {};
+        let payload = {};
         if (selector_id === 'guide_selector') {
             payload = { guide_id: selected_resource, keywords_id: selected_resource, script_id: selected_resource };
         } else if (selector_id === 'keyword_selector') {
@@ -241,34 +244,28 @@ setTimeout(() => {
         connection_message.innerHTML = message;
     }
 
-    function onSelectorChange(payload, callback) {
-        try {
-            GM_xmlhttpRequest({
-                method: 'PATCH',
-                url: `${SERVER_URL}/task-guide-info/` + slug_job_title,
-                headers: { 'Content-Type': 'application/json' },
-                data: JSON.stringify(payload),
-                responseType: 'json',
-                onload: function (response) {
-                    if (response.status === 200) {
-                        window.current_task_info = response.response.guide_info;
-                        guide_selector.value = response.response.selector_info.guide_id;
-                        keyword_selector.value = response.response.selector_info.keywords_id;
-                        script_selector.value = response.response.selector_info.script_id;
-                        if (!window.location.href.includes('dashboard')) {
-                            eval(window.current_task_info.script);
-                        }
-                        showMessage('Successfully updated', 'green');
-                        callback && callback();
-                    } else {
-                        showMessage('Error updating: ' + response.responseText, 'red');
-                    }
-                },
-            });
-        } catch (e) {
-            showMessage('Error updating: ' + e.message, 'red');
-            console.log(e);
+    async function onSelectorChange(payload, callback) {
+        const response = await fetch_resource({
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            uri: 'task-guide-info/' + slug_job_title,
+            payload: JSON.stringify(payload),
+        }).catch((error) => {
+            showMessage('Error updating: ' + error.message, 'red');
+            console.log(error);
+        });
+
+        window.current_task_info = response.guide_info;
+        guide_selector.value = response.selector_info.guide_id;
+        keyword_selector.value = response.selector_info.keywords_id;
+        script_selector.value = response.selector_info.script_id;
+        if (!window.location.href.includes('dashboard')) {
+            eval(window.current_task_info.script);
         }
+        showMessage('Successfully updated', 'green');
+        callback && callback();
     }
 
     function is_json_valid(json_string) {
@@ -280,21 +277,21 @@ setTimeout(() => {
         return true;
     }
 
-    async function get_server_info_for_this_task() {
-        GM_xmlhttpRequest({
+    async function get_server_info_for_this_task(job_title_slug) {
+        const response = await fetch_resource({
             method: 'GET',
-            url: `${SERVER_URL}/guides/needed/` + slug_job_title,
-            responseType: 'json',
-            onload: function (response) {
-                const { all_guides, selector_info, current_task_guide_info } = response.response;
-
-                populate_selectors(all_guides, selector_info);
-                window.current_task_info = current_task_guide_info;
-                if (!window.location.href.includes('dashboard')) {
-                    eval(window.current_task_info.script);
-                }
-            },
+            uri: 'guides/needed/' + job_title_slug,
+        }).catch((error) => {
+            showMessage('Error getting task info: ' + error.message, 'red');
+            console.log(error);
         });
+        const { all_guides, selector_info, current_task_guide_info } = response;
+
+        populate_selectors(all_guides, selector_info);
+        window.current_task_info = current_task_guide_info;
+        if (!window.location.href.includes('dashboard')) {
+            eval(window.current_task_info.script);
+        }
     }
 
     function populate_selectors(all_guides, selector_info) {
@@ -340,7 +337,7 @@ setTimeout(() => {
         });
     }
 
-    function create_guide(event) {
+    async function create_guide(event) {
         event.preventDefault();
         const guide_name = create_guide_modal.querySelector('#guide_name').value;
         const guide_collections = create_guide_modal.querySelector('#guide_collections').value;
@@ -353,73 +350,58 @@ setTimeout(() => {
             return;
         }
 
-        GM_xmlhttpRequest({
-            method: 'POST',
-            url: `${SERVER_URL}/guides`,
-            headers: { 'Content-Type': 'application/json' },
-            responseType: 'json',
-            data: JSON.stringify({
-                name: guide_name,
-                collections: guide_collections,
-                keywords: guide_keywords,
-                script: guide_script,
-            }),
-            onload: function (response) {
-                create_guide_modal.style.display = 'none';
-                if (response.status === 200) {
-                    showMessage('Successfully created', 'green');
-
-                    const new_option = document.createElement('option');
-                    new_option.text = guide_name;
-                    new_option.value = response.response._id;
-                    guide_selector.insertBefore(new_option, guide_selector.firstChild);
-                    keyword_selector.insertBefore(new_option.cloneNode(true), keyword_selector.firstChild);
-                    script_selector.insertBefore(new_option.cloneNode(true), script_selector.firstChild);
-                } else {
-                    showMessage('Failed to create ' + response.response.error.message, 'red');
-                }
-                create_guide_form.reset();
-            },
-        });
+        try {
+            const response = await fetch_resource({
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                uri: 'guides',
+                payload: JSON.stringify({
+                    name: guide_name,
+                    collections: guide_collections,
+                    keywords: guide_keywords,
+                    script: guide_script,
+                }),
+            });
+            const new_option = document.createElement('option');
+            new_option.text = guide_name;
+            new_option.value = response._id;
+            guide_selector.insertBefore(new_option, guide_selector.firstChild);
+            keyword_selector.insertBefore(new_option.cloneNode(true), keyword_selector.firstChild);
+            script_selector.insertBefore(new_option.cloneNode(true), script_selector.firstChild);
+            create_guide_form.reset();
+            create_guide_modal.style.display = 'none';
+        } catch (e) {
+            console.log(e);
+            showMessage('Error creating guide: ' + e.message, 'red');
+        }
     }
 
-    function update_resource(resource_id, payload) {
+    async function update_resource(resource_id, payload) {
         try {
-            GM_xmlhttpRequest({
+            const response = await fetch_resource({
                 method: 'PATCH',
-                url: `${SERVER_URL}/guides/` + resource_id,
                 headers: { 'Content-Type': 'application/json' },
-                responseType: 'json',
-                data: payload,
-                onload: function (response) {
-                    visualizer_modal.style.display = 'none';
-                    if (response.status === 200) {
-                        window.current_task_info = response.response;
-                        showMessage('Successfully updated', 'green');
-                        visualizer_modal_editor.value = '';
-                    } else {
-                        showMessage('Failed to update ' + response.response.error.message, 'red');
-                    }
-                },
+                uri: 'guides/' + resource_id,
+                payload: JSON.stringify(payload),
             });
+            window.current_task_info = response;
+            showMessage('Successfully updated', 'green');
+            visualizer_modal_editor.value = '';
         } catch (error) {
             console.log(error);
+            showMessage('Failed to update ' + error.message, 'red');
         }
     }
 
     function add_item_to_guide(payload) {
         return new Promise((resolve) => {
-            GM_xmlhttpRequest({
+            fetch_resource({
                 method: 'POST',
-                url: `${SERVER_URL}/guides/${current_task_info._id}`,
                 headers: { 'Content-Type': 'application/json' },
-                responseType: 'json',
-                data: JSON.stringify({
-                    task: payload,
-                }),
-                onload: function (response) {
-                    resolve(response.response);
-                },
+                uri: 'guides/' + window.current_task_info._id,
+                payload: JSON.stringify({ task: payload }),
+            }).then((response) => {
+                resolve(response);
             });
         });
     }
@@ -463,23 +445,23 @@ setTimeout(() => {
 
     function get_job_title_in_support_form() {
         const support_contact_form = document.querySelector('#contributor-support-contact-form');
-	if(support_contact_form){
-		const support_contact_url = new URL(support_contact_form?.getAttribute('data-src'));
-		const support_job_title = support_contact_url?.searchParams
-			?.get('ticket[custom_job_title]')
-			.replace(/\+/g, ' ');
-		const support_job_title_slug = support_job_title
-			?.replace(/ /g, '-')
-			.replace(/[^a-zA-Z-]/g, '')
-			.toLowerCase();
+        if (support_contact_form) {
+            const support_contact_url = new URL(support_contact_form?.getAttribute('data-src'));
+            const support_job_title = support_contact_url?.searchParams
+                ?.get('ticket[custom_job_title]')
+                .replace(/\+/g, ' ');
+            const support_job_title_slug = support_job_title
+                ?.replace(/ /g, '-')
+                .replace(/[^a-zA-Z-]/g, '')
+                .toLowerCase();
 
-		return {
-			title: support_job_title,
-			slug: support_job_title_slug,
-		};
-	}
+            return {
+                title: support_job_title,
+                slug: support_job_title_slug,
+            };
+        }
 
-	return null
+        return null;
     }
 
     function post_to_discord(blob, filename) {
@@ -488,7 +470,7 @@ setTimeout(() => {
 
             formData.append('files[0]', blob, filename + '.html');
 
-            fetch(discord_webhook_url, {
+            fetch(window.discord_webhook_url, {
                 method: 'POST',
                 body: formData,
             })
@@ -537,119 +519,34 @@ setTimeout(() => {
     if (missed_form?.action.includes('/contend')) {
         const correction_html = document.querySelector('html').cloneNode(true);
         const correction_scripts = correction_html.querySelectorAll('script');
-	    let script_index = null;
-	    Array.from(correction_scripts).forEach((script, index) => {
-		    if(script.innerHTML.includes('show answer')){
-			    script_index = index;
-		    }
-	    })
-	    correction_scripts[script_index].parentElement.removeChild(correction_scripts[script_index]);
+        let script_index = null;
+        Array.from(correction_scripts).forEach((script, index) => {
+            if (script.innerHTML.includes('show answer')) {
+                script_index = index;
+            }
+        });
+        correction_scripts[script_index].parentElement.removeChild(correction_scripts[script_index]);
         const correction_job_title = get_job_title_in_support_form()?.slug || 'correction';
 
         const html_blob = new Blob([correction_html.outerHTML], { type: 'text/html' });
         post_to_discord(html_blob, correction_job_title);
+
+        console.log(window.job_identifier);
     }
 
-    GM_addStyle(`
-        .custom-modal {
-            display: none; /* Hidden by default */
-                position: fixed; /* Stay in place */
-                z-index: 10000; /* Sit on top */
-                left: 0;
-            top: 0;
-            width: 100%; /* Full width */
-                height: 100%; /* Full height */
-                background-color: rgb(0,0,0); /* Fallback color */
-                background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-        }
-
-        .custom-modal-content {
-            position: relative;
-            background-color: #fefefe;
-            margin: auto;
-            padding: 0;
-            border: 1px solid #888;
-            width: 80%;
-            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
-            animation-name: animatetop;
-            animation-duration: 0.4s
-        }
-
-        .custom-modal-header {
-            padding: 10px 20px 0 10px;
-            color: white;
-            border-bottom: 1px solid #f1f1f1;
-        }
-
-        .custom-modal-body {
-            display: flex;
-            flex-direction: column;
-            max-height: 600px;
-            width: 100%;
-            overflow: auto;
-        }
-
-        .custom-modal-footer {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 16px;
-            color: white;
-            border-top: 1px solid #f1f1f1;
-            gap: 10px;
-        }
-
-        .custom-modal-footer input[type=button] {
-            padding: 5px 10px;
-            border-radius: 4px;
-        }
-
-        .custom-modal-footer input[type=submit] {
-            padding: 5px 10px;
-            border-radius: 4px;
-        }
-
-        .custom-modal-footer button {
-            padding: 5px 10px;
-            border-radius: 4px;
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        @keyframes animatetop {
-            from {top: -300px; opacity: 0}
-            to {top: 0; opacity: 1}
-        }
-
-        select {
-            margin-bottom: 0;
-            width: 100%;
-        }
-
-        .select-container {
-            display: flex;
-            align-items: center;
-            gap: 3px;
-            margin: 5px;
-        }
-
-        #TQCount {
-            width: 100%;
-            text-align: center;
-            margin-bottom: 15px;
-            font-weight: bold;
-        }
-
-        `);
+    function fetch_resource({ method, headers, payload, uri }) {
+        return new Promise((resolve, reject) => {
+            fetch(`${SERVER_URL}/${uri}`, {
+                method,
+                headers,
+                body: payload,
+            })
+                .then((response) => {
+                    resolve(response.json());
+                })
+                .catch((error) => {
+                    reject(error);
+                });
+        });
+    }
 });
