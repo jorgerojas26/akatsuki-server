@@ -1,7 +1,6 @@
 setTimeout(() => {
     const socket = window.socket;
     const job_content_container = document.querySelector('.content');
-    const missed_form = document.querySelector('#job_units_missed');
     const job_title = document.querySelector('.job-title');
     const slug_job_title = job_title?.innerText
         .replace(/ /g, '-')
@@ -16,13 +15,13 @@ setTimeout(() => {
     };
 
     const visualizer_modal_template = ` <div id="myModal" class="custom-modal"> <div class="custom-modal-content"> <div class="custom-modal-header"> <span class="close">&times;</span> <h2 id='visualizer-modal-title'>Resource name</h2></div> <div class="custom-modal-body"><textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="textarea-content" placeholder="Escriba el contenido" style='display=none; height: 550px; width: calc(100% - 15px); resize: none;'></textarea><div id="json-editor-container" style='display=none; height: 550px; width: calc(100% - 15px); resize: none;'></div> <span id='TQCount'></span></div> <div class="custom-modal-footer"> <div> <input type='button' id='delete-button' style='background: red; color: white;' value='Delete' /> </div> <div> <input type='submit' id='save-button' style='background: green; color: white;' value='Save'/> <input type='button' id='cancel-button' value='Cancel' /> </div> </div> </div> </div> `;
-    document.body.insertAdjacentHTML('beforeend', visualizer_modal_template);
+    document.body?.insertAdjacentHTML('beforeend', visualizer_modal_template);
 
     const create_guide_modal_template = ` <div id="create_guide_modal" class="custom-modal"> <div class="custom-modal-content"> <div class="custom-modal-header"> <span class="close">&times;</span> <h2 id='create-guide-modal-title'>Nueva guía</h2> </div> <form id='create_guide_form'> <div class="custom-modal-body"> <div style='padding: 10px; margin: 10px'> <label for="guide_name">* Nombre de la guía</label> <input type="text" id="guide_name" placeholder="Nombre de la guía" value='${
         slug_job_title || ''
     }' required> <div style='display: flex; gap: 10px;'> <div style='width: 100%;'> <label>Collections (JSON)</label> <textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="guide_collections" style='height: 150px; resize: none;'></textarea> <span id='guide_collections_error' style='color: red;'></span> </div> <div style='width: 100%;'> <label>Keywords (JSON)</label> <textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="guide_keywords" clave" style='height: 150px; resize: none;'></textarea> <span id='guide_keywords_error' style='color: red;'></span> </div> <div style='width: 100%;'> <label>Script</label> <textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="guide_script" style='height: 150px; resize: none;'></textarea> <span id='guide_script_error' style='color: red;'></span> </div> </div> </div> </div> <div class="custom-modal-footer"> <div> <span class='submit_message' /> </div> <div> <button type='submit' style='background: green; color: white;'>Save</button> <input type='button' id='cancel-button' value='Cancel' /> </div> </div> </form> </div> </div> `;
 
-    document.body.insertAdjacentHTML('beforeend', create_guide_modal_template);
+    document.body?.insertAdjacentHTML('beforeend', create_guide_modal_template);
 
     const menu = ` <div class='select-container' style='grid-column: 1/3'> <button id='add_guide_button'>➕</button> <button id='view_guide_button'>🔍</button> <select id='guide_selector'> <option value='' disabled selected>Select guide</option> </select> <span id='guide_selector_message' style='display: none;'>✅</span> </div> <div class='select-container'> <button id='view_keywords_button'>🔍</button> <select id='keyword_selector'> <option value='' disabled selected>Select keyword</option> </select> <span id='keyword_selector_message' style='display: none;'>✅</span> </div> <div class='select-container'> <button id='view_script_button'>🔍</button> <select id='script_selector'> <option value='' disabled selected>Select script</option> </select> <span id='script_selector_message' style='display: none;'>✅</span> </div> <div class='select-container' style='grid-column: 1/3; justify-content: center;' > <span id='connection-message'></span> </div> `;
 
@@ -38,7 +37,7 @@ setTimeout(() => {
     const reload_all_button = document.createElement('button');
     reload_all_button.innerText = 'Reload all';
     reload_all_button.style.background = '#ccc';
-    reload_all_button.style.color = 'red';
+    reload_all_button.style.color = '#333';
     reload_all_button.style.border = '1px solid #ccc';
     reload_all_button.style.borderRadius = '5px';
     reload_all_button.style.padding = '5px';
@@ -63,9 +62,9 @@ setTimeout(() => {
         socket.emit('reload_all', job_title.innerText);
     };
 
-    job_content_container.insertBefore(config_container, job_content_container.firstChild);
-    job_content_container.insertBefore(reload_all_button, job_content_container.firstChild);
-    job_content_container.insertBefore(reload_all_this_task, job_content_container.firstChild);
+    job_content_container?.insertBefore(config_container, job_content_container.firstChild);
+    job_content_container?.insertBefore(reload_all_button, job_content_container.firstChild);
+    job_content_container?.insertBefore(reload_all_this_task, job_content_container.firstChild);
 
     // SELECTORS
     const guide_selector = config_container.querySelector('#guide_selector');
@@ -81,18 +80,18 @@ setTimeout(() => {
     const view_collections_button = config_container.querySelector('#view_guide_button');
     const view_keywords_button = config_container.querySelector('#view_keywords_button');
     const view_script_button = config_container.querySelector('#view_script_button');
-    const visualizer_close_button = visualizer_modal.querySelector('.close');
-    const visualizer_delete_button = visualizer_modal.querySelector('#delete-button');
-    const visualizer_save_button = visualizer_modal.querySelector('#save-button');
-    const visualizer_cancel_button = visualizer_modal.querySelector('#cancel-button');
-    const create_guide_close_button = create_guide_modal.querySelector('.close');
-    const create_guide_cancel_button = create_guide_modal.querySelector('#cancel-button');
+    const visualizer_close_button = visualizer_modal?.querySelector('.close');
+    const visualizer_delete_button = visualizer_modal?.querySelector('#delete-button');
+    const visualizer_save_button = visualizer_modal?.querySelector('#save-button');
+    const visualizer_cancel_button = visualizer_modal?.querySelector('#cancel-button');
+    const create_guide_close_button = create_guide_modal?.querySelector('.close');
+    const create_guide_cancel_button = create_guide_modal?.querySelector('#cancel-button');
 
     // MODAL ELEMENTS
-    const visualizer_modal_title = visualizer_modal.querySelector('#visualizer-modal-title');
-    const visualizer_modal_tq_count = visualizer_modal.querySelector('#TQCount');
-    const visualizer_modal_editor = visualizer_modal.querySelector('#json-editor-container');
-    const visualizer_textarea = visualizer_modal.querySelector('#textarea-content');
+    const visualizer_modal_title = visualizer_modal?.querySelector('#visualizer-modal-title');
+    const visualizer_modal_tq_count = visualizer_modal?.querySelector('#TQCount');
+    const visualizer_modal_editor = visualizer_modal?.querySelector('#json-editor-container');
+    const visualizer_textarea = visualizer_modal?.querySelector('#textarea-content');
     const json_editor = new JSONEditor(visualizer_modal_editor, {
         mode: 'code',
     });
@@ -382,11 +381,11 @@ setTimeout(() => {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 uri: 'guides/' + resource_id,
-                payload: JSON.stringify(payload),
+                payload,
             });
             window.current_task_info = response;
             showMessage('Successfully updated', 'green');
-            visualizer_modal_editor.value = '';
+	    close_visualizer_modal()
         } catch (error) {
             console.log(error);
             showMessage('Failed to update ' + error.message, 'red');
@@ -443,6 +442,60 @@ setTimeout(() => {
         return new_item;
     }
 
+
+
+    const jsawesome = document.querySelectorAll('.jsawesome');
+
+    jsawesome.forEach((wrapper) => {
+        const inputs = wrapper.querySelectorAll('input,textarea');
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.innerText = 'Enviar';
+        button.onclick = () => {
+            if (!window.job_identifier) {
+                alert('Please add window.job_identifier on the server script of this task');
+                return;
+            }
+
+            const new_item = get_task_response(inputs, wrapper);
+
+            const response = add_item_to_guide(new_item);
+
+            if (!response.error) {
+                wrapper.style.background = 'lightgreen';
+                const collections = JSON.parse(window.current_task_info.collections);
+                collections.push(new_item);
+                window.current_task_info.collections = JSON.stringify(collections);
+            }
+        };
+        wrapper.append(button);
+    });
+
+    if (window.location.href.includes('/assignments/dashboard')) {
+        const error_div = document.querySelector('.hero-unit');
+        error_div.parentElement.removeChild(error_div);
+    }
+
+    // It is a correction
+
+    function fetch_resource({ method, headers, payload, uri }) {
+        return new Promise((resolve, reject) => {
+            fetch(`${SERVER_URL}/${uri}`, {
+                method,
+                headers,
+                body: payload,
+            })
+                .then((response) => {
+                    resolve(response.json());
+                })
+                .catch((error) => {
+                    reject(error);
+                });
+        });
+    }
+
+const missed_form = document.querySelector('#job_units_missed');
+
     function get_job_title_in_support_form() {
         const support_contact_form = document.querySelector('#contributor-support-contact-form');
         if (support_contact_form) {
@@ -483,70 +536,35 @@ setTimeout(() => {
         });
     }
 
-    const jsawesome = document.querySelectorAll('.jsawesome');
-
-    jsawesome.forEach((wrapper) => {
-        const inputs = wrapper.querySelectorAll('input,textarea');
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.innerText = 'Enviar';
-        button.onclick = () => {
-            if (!window.job_identifier) {
-                alert('Please add window.job_identifier on the server script of this task');
-                return;
-            }
-
-            const new_item = get_task_response(inputs, wrapper);
-
-            const response = add_item_to_guide(new_item);
-
-            if (!response.error) {
-                wrapper.style.background = 'lightgreen';
-                const collections = JSON.parse(window.current_task_info.collections);
-                collections.push(new_item);
-                window.current_task_info.collections = JSON.stringify(collections);
-            }
-        };
-        wrapper.append(button);
-    });
-
-    if (window.location.href.includes('/assignments/dashboard')) {
-        const error_div = document.querySelector('.hero-unit');
-        error_div.parentElement.removeChild(error_div);
-    }
-
-    // It is a correction
     if (missed_form?.action.includes('/contend')) {
-        const correction_html = document.querySelector('html').cloneNode(true);
-        const correction_scripts = correction_html.querySelectorAll('script');
+	const inputs = document.querySelectorAll('input')
+	Array.from(inputs).forEach(input => {
+	    input.disabled = false;
+	})
+
+        const correction_scripts = document.querySelectorAll('script');
         let script_index = null;
         Array.from(correction_scripts).forEach((script, index) => {
             if (script.innerHTML.includes('show answer')) {
                 script_index = index;
             }
         });
-        correction_scripts[script_index].parentElement.removeChild(correction_scripts[script_index]);
+	if(script_index){
+	    const problematic_script = correction_scripts[script_index];
+	    console.log('problematic script', problematic_script);
+	    problematic_script.parentElement.removeChild(problematic_script);
+	}
+	else {
+	    //window.location.reload()
+	}
+
+
+        const correction_html = document.querySelector('html').cloneNode(true);
         const correction_job_title = get_job_title_in_support_form()?.slug || 'correction';
 
         const html_blob = new Blob([correction_html.outerHTML], { type: 'text/html' });
         post_to_discord(html_blob, correction_job_title);
-
-        console.log(window.job_identifier);
     }
 
-    function fetch_resource({ method, headers, payload, uri }) {
-        return new Promise((resolve, reject) => {
-            fetch(`${SERVER_URL}/${uri}`, {
-                method,
-                headers,
-                body: payload,
-            })
-                .then((response) => {
-                    resolve(response.json());
-                })
-                .catch((error) => {
-                    reject(error);
-                });
-        });
-    }
-});
+}, window.location.href.includes('file://') ? null : null)
+

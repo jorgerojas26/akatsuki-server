@@ -78,7 +78,9 @@ io.on('connection', (socket) => {
     });
 });
 
-app.use(express.static('public'));
+app.use(express.static('public', {
+	maxAge: '60000'
+}));
 
 httpServer.listen(process.env.PORT || 3000, () => {
     console.log('listening on ', process.env.PORT || 3000);
