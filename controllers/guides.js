@@ -62,8 +62,6 @@ const GET_GUIDE_BY_ID = async (req, res) => {
         if (!guide) {
             return res.status(404).json({ error: { message: 'Guide not found' } });
         }
-        console.log(JSON.parse(guide.collections).reverse());
-
         res.status(200).json(guide);
     } catch (error) {
         res.status(500).json({ error: { message: error.message } });
@@ -72,7 +70,7 @@ const GET_GUIDE_BY_ID = async (req, res) => {
 
 const CREATE_GUIDE = async (req, res) => {
     try {
-        const { name = '', collections = '', keywords = '', script = '' } = req.body;
+        const { name = '', collections = [], keywords = [], script = '' } = req.body;
 
         if (!name || name === '') {
             return res.status(400).json({ error: { message: 'name is required' } });
@@ -86,8 +84,8 @@ const CREATE_GUIDE = async (req, res) => {
 
         const guide = new Guide({
             name,
-            collections: collections || '[]',
-            keywords: keywords || '[]',
+            collections: collections,
+            keywords: keywords,
             script,
         });
         await guide.save();
@@ -103,6 +101,8 @@ const UPDATE_GUIDE = async (req, res) => {
         const { name = '', collections, keywords, script } = req.body;
         const { id } = req.params;
 
+        console.log(collections);
+
         const guide = await Guide.findOne({ _id: id });
         if (!guide) {
             return res.status(404).json({ error: { message: 'Guide not found' } });
@@ -113,8 +113,8 @@ const UPDATE_GUIDE = async (req, res) => {
         if (keywords) guide.keywords = keywords;
         if (script) guide.script = script;
 
-        if (!guide.collections) guide.collections = '[]';
-        if (!guide.keywords) guide.keywords = '[]';
+        if (!guide.collections) guide.collections = [];
+        if (!guide.keywords) guide.keywords = [];
 
         await guide.save();
         res.status(200).json(guide);
@@ -125,6 +125,7 @@ const UPDATE_GUIDE = async (req, res) => {
 };
 
 const ADD_ITEM_TO_GUIDE = async (req, res) => {
+    console.log('jelou');
     try {
         const { id } = req.params;
         const { task } = req.body;
@@ -138,7 +139,7 @@ const ADD_ITEM_TO_GUIDE = async (req, res) => {
             (item) => item.identifier_value !== task.identifier_value
         );
         collections.push(task);
-        guide.collections = JSON.stringify(collections);
+        guide.collections = collections;
 
         await guide.save();
         res.status(200).json(guide);
