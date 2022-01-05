@@ -160,7 +160,7 @@ setTimeout(() => {
     visualizer_save_button.onclick = () => {
         const resource_id = visualizer_save_button.getAttribute('data-resource-id');
         const resource_name = visualizer_save_button.getAttribute('data-resource-name');
-        const text = resource_name !== 'script' ? json_editor.getText() : visualizer_textarea.value;
+        const text = resource_name !== 'script' ? json_editor.get() : visualizer_textarea.value;
 
         if ((resource_name === 'collections' || resource_name === 'keywords') && !is_json_valid(text)) {
             visualizer_modal.style.display = 'none';
@@ -275,7 +275,7 @@ setTimeout(() => {
 
     function is_json_valid(json_string) {
         try {
-            JSON.parse(json_string);
+            JSON.parse(JSON.stringify(json_string));
         } catch (e) {
             return false;
         }
