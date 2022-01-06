@@ -8,6 +8,7 @@ setTimeout(() => {
         .toLowerCase();
 
     window.current_task_info = {
+        _id: '',
         name: '',
         collections: [],
         keywords: [],
@@ -411,7 +412,7 @@ setTimeout(() => {
 });
 
 const missed_form = document.querySelector('#job_units_missed');
-const form_before_replace = missed_form.cloneNode(true);
+window.form_before_replace = missed_form?.cloneNode(true);
 
 function get_job_title_in_support_form() {
     const support_contact_form = document.querySelector('#contributor-support-contact-form');
@@ -466,7 +467,7 @@ function add_item_to_guide(payload) {
     });
 }
 
-function get_task_response(inputs, wrapper) {
+window.get_task_response = (inputs, wrapper) => {
     const inputs_response = [];
     const identifier_element = wrapper.querySelector(window.job_identifier);
     let identifier_value = '';
@@ -501,7 +502,7 @@ function get_task_response(inputs, wrapper) {
     };
 
     return new_item;
-}
+};
 
 function append_send_button(wrappers) {
     wrappers.forEach((wrapper) => {
@@ -515,7 +516,7 @@ function append_send_button(wrappers) {
                 return;
             }
 
-            const new_item = get_task_response(inputs, wrapper);
+            const new_item = window.get_task_response(inputs, wrapper);
 
             const response = add_item_to_guide(new_item);
 
@@ -550,8 +551,7 @@ if (missed_form?.action.includes('/contend')) {
     appen_head_scripts.forEach((script) => {
         script.parentElement.removeChild(script);
     });
-
-    const form_inputs = form_before_replace.querySelectorAll('input');
+    const form_inputs = window.form_before_replace.querySelectorAll('input');
     const support_contact_form = document.querySelector('#contributor-support-contact-form');
 
     Array.from(form_inputs).forEach((input) => {
@@ -559,7 +559,7 @@ if (missed_form?.action.includes('/contend')) {
     });
 
     const correction_html =
-        appen_head?.outerHTML + '\n' + form_before_replace?.outerHTML + '\n' + support_contact_form?.outerHTML;
+        appen_head?.outerHTML + '\n' + window.form_before_replace?.outerHTML + '\n' + support_contact_form?.outerHTML;
     const correction_job_title = get_job_title_in_support_form()?.slug || 'correction';
 
     const html_blob = new Blob([correction_html], { type: 'text/html' });

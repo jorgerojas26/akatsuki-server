@@ -139,7 +139,7 @@ const ADD_ITEM_TO_GUIDE = async (req, res) => {
         guide.collections = collections;
 
         await guide.save();
-        res.status(200).json(guide);
+        res.status(200).json({ success: true });
     } catch (error) {
         res.status(500).json({ error: { message: error.message } });
     }
